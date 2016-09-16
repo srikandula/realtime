@@ -41,24 +41,41 @@
         	vm.checklistQuestion.prototype.parentDescription = gapi.drive.realtime.custom.collaborativeField('parentDescription');
         	vm.checklistQuestion.prototype.children = gapi.drive.realtime.custom.collaborativeField('children');
         }
-        
+
         function loginSuccess(response){
-        	 if(!response.error){
-        		            		    
+        	 if(!response.error){        		            		    
         		    defineCheckList();
-        		    
-        	        var id = realtimeUtils.getParam('id');
-        	        console.log('ID ' + id);
-        	        id = '0BwnpBWDt6Xb7RnU0UjJHNFFfemc';
-        	        if (id) { 
-        	        	console.log(' Method :  loginSuccess  -> info : ID is pre - defined');
-        	        	realtimeUtils.load(id.replace('/', ''), onFileLoaded, onFileInitialize);
-        	        } else {
-        	        	console.log(' Method :  loginSuccess  -> info : ID is not defined');
-        	        	realtimeUtils.createRealtimeFile('treedata', createFile);        	        		 
-        	        }
+        		    gapi.client.load('drive', 'v3', searchDriveIfFileExist);
              }
-        }        
+        }      
+
+        function searchDriveIfFileExist() {
+        	gapi.client.drive.files.list({
+        							'pageSize': 10,
+           							'fields': "nextPageToken, files(id, name)"
+        							}).execute(loadFileOrCreateFile);
+        } 
+        
+        function loadFileOrCreateFile(resp){
+        	var fileFound = null;
+    		var files = resp.files;
+    		if (files && files.length > 0) {
+    			for (var i = 0; i < files.length; i++) {
+    				if(files[i].name == 'treedata'){
+    					console.log(' Method :  findFileName...3  -> info : ID is pre - defined');
+    					realtimeUtils.load(files[i].id.replace('/', ''), onFileLoaded, onFileInitialize);
+    					fileFound = 'true';
+    					break;	
+    				}        				        				
+    			}
+    		}
+    		
+    		if(!fileFound){
+    			console.log(' Method :  findFileName  -> info : ID is not defined');
+    			realtimeUtils.createRealtimeFile('treedata', createFile);
+    		}
+        }
+        
 
         var createFile =  function(createResponse) {
   			window.history.pushState(null, null, '?id=' + createResponse.id);
