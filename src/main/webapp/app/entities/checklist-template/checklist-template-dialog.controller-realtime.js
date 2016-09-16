@@ -17,41 +17,43 @@
 
         var clientId = '370295086792-2c0r6ve8mm7ot16ie1tq2ne9fe705ugg.apps.googleusercontent.com';
         var realtimeUtils = new utils.RealtimeUtils({ clientId: clientId });
-        autoAuthorize();
         
-        function autoAuthorize() {
-            realtimeUtils.authorize(loginSuccess, false);
+        vm.authorize = function authorize() {
+            realtimeUtils.authorize(vm.loginSuccess, false);
         }
         
-        function loginSuccess(response){
+        vm.loginSuccess = function(response){
         	 if(!response.error){
+        		    console.log(' Method : loginSuccess  -> info : Before getParam from realtimeUtils');
         	        var id = realtimeUtils.getParam('id');
         	        console.log('ID ' + id);
-        	        //id = '0BwnpBWDt6Xb7RkVTQ1JRaHZaVEE';
-        	        if (id) { 
-        	        	console.log(' Method :  loginSuccess  -> info : ID is pre - defined');
-        	        	realtimeUtils.load(id.replace('/', ''), onFileLoaded, onFileInitialize);
+        	        id = '0BwnpBWDt6Xb7RkVTQ1JRaHZaVEE';
+        	        console.log(' Method : loginSuccess  -> info : Before getParam from realtimeUtils-->' + id);
+        	        if (id) {        	        	
+        	        	console.log(' Method :  loginSuccess  -> info : ID is defined');
+        	          realtimeUtils.load(id.replace('/', ''), onFileLoaded, onFileInitialize);
         	        } else {
         	        	console.log(' Method :  loginSuccess  -> info : ID is not defined');
-        	        	realtimeUtils.createRealtimeFile('treedata', createFile);        	        		 
+        	          realtimeUtils.createRealtimeFile('treedata', 
+        	        		  function(createResponse) {
+        	        	  			window.history.pushState(null, null, '?id=' + createResponse.id);
+        	        	  			realtimeUtils.load(createResponse.id, onFileLoaded, onFileInitialize);
+        	          		  });
         	        }
              }
         }        
 
-        var createFile =  function(createResponse) {
-  			window.history.pushState(null, null, '?id=' + createResponse.id);
-  			realtimeUtils.load(createResponse.id, onFileLoaded, onFileInitialize);
-		};
-		
+        
 		var onFileInitialize = function onFileInitialize(model) {
 			console.log(' Method :  onFileInitialize  -> info :');
 			var string = model.createString();
 			string.setText('Question template model');
+			console.log(' Method :  onFileInitialize  -> info : Added colloborative string to model -> ' +string);
 			model.getRoot().set('treedata_demo_string', string);
 		}
-        	        	
+		
 		var onFileLoaded = function onFileLoaded(doc) {
-			console.log(' Method :  onFileLoaded  -> info :');
+			console.log(' Method : onFileLoaded  -> info :');
 		    var collaborativeString = doc.getModel().getRoot().get('treedata_demo_string');
 		    console.log(' Method :  onFileLoaded  -> info :' + collaborativeString);
 		    updateRealtimeTextBox(collaborativeString);
