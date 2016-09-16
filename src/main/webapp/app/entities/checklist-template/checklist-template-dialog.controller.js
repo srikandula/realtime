@@ -39,6 +39,7 @@
         	vm.checklistQuestion.prototype.checklistName = gapi.drive.realtime.custom.collaborativeField('checklistName');
         	vm.checklistQuestion.prototype.parentId = gapi.drive.realtime.custom.collaborativeField('parentId');
         	vm.checklistQuestion.prototype.parentDescription = gapi.drive.realtime.custom.collaborativeField('parentDescription');
+        	vm.checklistQuestion.prototype.children = gapi.drive.realtime.custom.collaborativeField('children');
         }
         
         function loginSuccess(response){
@@ -48,7 +49,7 @@
         		    
         	        var id = realtimeUtils.getParam('id');
         	        console.log('ID ' + id);
-        	        id = '0BwnpBWDt6Xb7YWo5aVFFQTdUYlk';
+        	        //id = '0BwnpBWDt6Xb7aW4zbktDT2otSFE';
         	        if (id) { 
         	        	console.log(' Method :  loginSuccess  -> info : ID is pre - defined');
         	        	realtimeUtils.load(id.replace('/', ''), onFileLoaded, onFileInitialize);
@@ -77,6 +78,25 @@
 			node1.checklistName= "Smaller Registrants (Form 10-K) and Other Public Entities";
 			node1.parentId= null;
 			node1.parentDescription= null;
+			
+			var node1_1 = model.create('checklistQuestion');
+			var node1_2 = model.create('checklistQuestion');
+			var node1_3 = model.create('checklistQuestion');
+			node1_1.id= 11;
+			node1_1.code= "A-1";
+			node1_1.description= "A-1: .....";
+			node1_2.id= 12;
+			node1_2.code= "A-2";
+			node1_2.description= "A-2: .....";
+			node1_3.id= 13;
+			node1_3.code= "A-3";
+			node1_3.description= "A-3: .....";
+			var children1 = model.createList();
+			children1.push(node1_1);
+			children1.push(node1_2);
+			children1.push(node1_3);
+			node1.children = children1;
+			
 			vm.treedata.push(node1);
 			
 			var node2 = model.create('checklistQuestion');
@@ -87,6 +107,7 @@
 			node2.checklistName= "BALANCE SHEET : ASSETS";
 			node2.parentId= null;
 			node2.parentDescription= null;	
+			node2.children = model.createList();
 			vm.treedata.push(node2);
 	
 			var node3 = model.create('checklistQuestion');
@@ -97,22 +118,21 @@
 			node3.checklistName= "INCOME STATEMENT";
 			node3.parentId= null;
 			node3.parentDescription= null;
+			node3.children = model.createList();
 			vm.treedata.push(node3);
 						
 			model.getRoot().set('checklistQuestion', vm.treedata);
 		}
         	        	
 		var onFileLoaded = function onFileLoaded(doc) {
-			console.log(' Method :  onFileLoaded  -> info :');
 			vm.treedata = doc.getModel().getRoot().get('checklistQuestion');
-			vm.nodeArray = vm.treedata.asArray();
-			//vm.treedata[0].addEventListener(gapi.drive.realtime.EventType.VALUE_CHANGED, updateRealtimeTextBox);
+			vm.treedata.addEventListener(gapi.drive.realtime.EventType.VALUE_CHANGED, updateRealtimeTextBox);
+			console.log(' Method :  onFileLoaded  -> info : Data retrieved...');
 		}
 		
 		function updateRealtimeTextBox(collaborativeString) {
-			console.log(' Method : updateRealtimeTextBox  -> info :');
-			//var realtimeTextBox = document.getElementById('field_realtime');
-	        //gapi.drive.realtime.databinding.bindString(collaborativeString, realtimeTextBox);
+			//console.log(' Method : updateRealtimeTextBox  -> info :');
+	        //gapi.drive.realtime.databinding.bindString(collaborativeString);
 	    }
 
         $timeout(function (){

@@ -19,11 +19,21 @@
                     ng-model="vm.checklist_template.question"
                      />
         </div>
-         <div class="form-group" ng-repeat="node in vm.nodeArray">
-            <label class="control-label">Realtime API {{node.id}}</label>
-            <input type="text" class="form-control" name="description_{{node.id}}" id="field_description_{{node.id}}"
-                    ng-model="node.description"
+        <div  ng-repeat="node in vm.treedata.asArray()">
+        	<div class="form-group">
+            	<label class="control-label">Realtime API {{node.id}} </label>
+            	<input type="text" class="form-control" name="description_{{node.id}}" id="field_description_{{node.id}}"
+                	    ng-model="node.description"
+                    	 />
+            </div>
+            <div ng-repeat="child in node.children.asArray()">
+              	<div class="form-group">
+            		<label class="control-label">Child {{child.id}}</label>
+          	  		<input type="text" class="form-control" name="description_{{child.id}}" id="field_description_{{child.id}}"
+                    		ng-model="child.description"
                      />
+                 </div>
+            </div>            
         </div>
 
     </div>
